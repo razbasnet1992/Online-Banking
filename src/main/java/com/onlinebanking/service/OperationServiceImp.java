@@ -11,13 +11,13 @@ public class OperationServiceImp implements OperationService{
 
 	OperationDao operationDao = new OperationDaoImp();
 	@Override
-	public int createAccount(Account account) {
-	  return operationDao.createAccount(account);
+	public int createAccount(Account account,double balance) {
+	  return operationDao.createAccount(account,balance);
 	}
 
 	@Override
 	public int depositAmount(int id,double depositAmount) {
-		return operationDao.depositAmount(id,depositAmount);
+  		return operationDao.depositAmount(id,depositAmount);
 	}
 
 	@Override

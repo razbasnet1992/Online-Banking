@@ -14,7 +14,7 @@ import com.onlinebanking.util.DbUtil;
 
 public class OperationDaoImp implements OperationDao {
 
-	public static final String INSERT_ACCOUNT_INFO = "insert into account_db(account_name,account_no,id,email,mobile_no) values(?,?,?,?,?)";
+	public static final String INSERT_ACCOUNT_INFO = "call insert_into_twoTables(?,?,?,?,?)";
 	public static final String DELETE_QUERY = "DELETE account_db,transaction_tbl from account_db  INNER JOIN transaction_tbl  \n"
 			+ "WHERE account_db.id= transaction_tbl.id and account_db.id = ?";
 
@@ -28,13 +28,14 @@ public class OperationDaoImp implements OperationDao {
 	String now = formatter.format(date);
 
 	@Override
-	public int createAccount(Account account) {
+	public int createAccount(Account account,double balance) {
 		try (PreparedStatement pa = DbUtil.getConnection().prepareStatement(INSERT_ACCOUNT_INFO);) {
 			pa.setString(1, account.getAccountName());
 			pa.setLong(2, account.getAccountNo());
-			pa.setInt(3, account.getId());
-			pa.setString(4, account.getEmail());
-			pa.setLong(5, account.getMobileNo());
+			pa.setString(3, account.getEmail());
+			pa.setLong(4, account.getMobileNo());
+			pa.setDouble(5, balance);
+			pa.executeUpdate();
 
 		} catch (SQLException | ClassNotFoundException e) {
 			e.printStackTrace();
@@ -52,14 +53,15 @@ public class OperationDaoImp implements OperationDao {
 			double currentBalance = 0;
 			if (rs.next()) {
 				currentBalance = rs.getDouble("balance");
-				System.out.println("Balance before withdrawing :" + currentBalance + " for account id :" + id);
+				System.out.println("Balance before deposit operation :" + currentBalance + " for account id :" + id);
 				System.out.println("Deposited Amount :" + depositAmount);
 				if (depositAmount > 0) {
 					currentBalance += depositAmount;
-					d = pa.executeUpdate("update transaction_tbl set balance ='" + currentBalance + "',deposit_amount='"
+					d =pa.executeUpdate("update transaction_tbl set balance ='" + currentBalance + "',deposit_amount='"
 							+ depositAmount + "',deposit_date ='" + now + "' where id ='" + id + "'");
+				
 					System.out
-							.println("Account Balance after withdrawing :" + currentBalance + " for account id :" + id);
+							.println("Account Balance after deposit :" + currentBalance + " for account id :" + id);
 				} else {
 					System.out.println("Amount should be greater than zero.");
 				}
@@ -101,6 +103,7 @@ public class OperationDaoImp implements OperationDao {
 
 	@Override
 	public boolean checkBalance(int id) {
+		boolean flag = false;
 		try (PreparedStatement pa = DbUtil.getConnection().prepareStatement(GET_BALANCE);) {
 			pa.setInt(1, id);
 			ResultSet rs = pa.executeQuery();
@@ -108,11 +111,12 @@ public class OperationDaoImp implements OperationDao {
 			if (rs.next()) {
 				currentBalance = rs.getDouble("balance");
 				System.out.println(currentBalance + " for account id :" + id);
+				flag = true;
 			}
 		} catch (SQLException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return flag;
 	}
 
 	@Override

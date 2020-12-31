@@ -7,7 +7,7 @@ import com.onlinebanking.model.AccountInfo;
 
 
 public interface OperationService {
-	int createAccount(Account account);
+	int createAccount(Account account,double balance);
 	int depositAmount(int id,double depositAmount);
 	int withdrawAmount(int id,double withdrawnAmount);
 	boolean checkBalance(int id);
