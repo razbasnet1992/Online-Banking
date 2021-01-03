@@ -59,7 +59,6 @@ public class OperationDaoImp implements OperationDao {
 					currentBalance += depositAmount;
 					d =pa.executeUpdate("update transaction_tbl set balance ='" + currentBalance + "',deposit_amount='"
 							+ depositAmount + "',deposit_date ='" + now + "' where id ='" + id + "'");
-				
 					System.out
 							.println("Account Balance after deposit :" + currentBalance + " for account id :" + id);
 				} else {
