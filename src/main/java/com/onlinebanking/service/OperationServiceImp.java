@@ -45,5 +45,10 @@ public class OperationServiceImp implements OperationService{
 		return operationDao.deleteCustomer(id);
 	}
 
+	@Override
+	public int sumAndCountCustomers() {
+		return operationDao.sumAndCountCustomers();
+	}
+
 	
 }

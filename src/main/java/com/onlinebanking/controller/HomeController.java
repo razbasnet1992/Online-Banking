@@ -15,7 +15,7 @@ public class HomeController {
 	public static void main(String[] args) {
 		OperationService operationService = new OperationServiceImp();
 		Scanner scanner = new Scanner(System.in);
-		System.out.println("Enter one of the following:\ncreate/deposit/draw/check/delete/list/customer");
+		System.out.println("Enter one of the following:\ncreate/deposit/draw/check/delete/list/customer/sum");
 		String s = scanner.next();
 
 		switch (s) {
@@ -64,15 +64,15 @@ public class HomeController {
 			break;
 		case "list":
 			List<AccountInfo> list = operationService.listOfCustomers();
-			for (AccountInfo info : list) {
-				System.out.println("Account id :"+info.getAccountId());
-				System.out.println("Account Name :"+info.getAccountName());
-				System.out.println("Account number :"+info.getAccountNo());
-				System.out.println("Email address :"+info.getEmail());
-				System.out.println("Account Balance :"+info.getBalance());
-				System.out.println("Phone number :"+info.getMobileNo());
+			list.stream().forEach(c-> {
+				System.out.println("Account id :"+c.getAccountId());
+				System.out.println("Account Name :"+c.getAccountName());
+				System.out.println("Account number :"+c.getAccountNo());
+				System.out.println("Email address :"+c.getEmail());
+				System.out.println("Account Balance :"+c.getBalance());
+				System.out.println("Phone number :"+c.getMobileNo());
 				System.out.println("=============");
-			}
+			});
 			break;
 		case "customer":
 			id = Integer.parseInt(JOptionPane.showInputDialog("Enter id :"));
@@ -84,6 +84,7 @@ public class HomeController {
 			System.out.println("Email address :"+info.getEmail());
 			System.out.println("Account Balance :"+info.getBalance());
 			System.out.println("Phone number :"+info.getMobileNo());
+			;
 			break;
 		case "delete":
 			id = Integer.parseInt(JOptionPane.showInputDialog("Enter id :"));
@@ -95,7 +96,15 @@ public class HomeController {
 				System.out.println("Try again");
 			}
 			break;
-
+		case "sum":
+			int count =operationService.sumAndCountCustomers();
+			if(count>=1) {
+				System.out.println("Sucess");
+			}
+			else {
+				System.out.println("Something is wrong");
+			}
+			break;
 		default:
 			System.out.println("Wrong choice!!");
 		}

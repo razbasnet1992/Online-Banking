@@ -22,6 +22,7 @@ public class OperationDaoImp implements OperationDao {
 			+ "where id =?";
 	public static final String GET_CUSTOMERS_LIST = "select * from bank_db.account_db inner join bank_db.transaction_tbl using(id)";
 	public static final String GET_BALANCE = "select balance from transaction_tbl where id = ?";
+	public static final String GET_SUM_AND_COUNT = "select count(id),sum(balance) from transaction_tbl";
 	Date date = new Date();
 	String pattern = "yyyy-MM-dd";
 	SimpleDateFormat formatter = new SimpleDateFormat(pattern);
@@ -184,6 +185,21 @@ public class OperationDaoImp implements OperationDao {
 			e.printStackTrace();
 		}
 		return deleteNum;
+	}
+	public int sumAndCountCustomers() {
+		int count =0;
+		try(PreparedStatement pa = DbUtil.getConnection().prepareStatement(GET_SUM_AND_COUNT);){
+			ResultSet rs = pa.executeQuery();
+			if(rs.next()) {
+				
+				System.out.println("Total balance in the bank :"+rs.getDouble(2));
+				System.out.println("Total customers :"+rs.getInt(1));
+				count =1;
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return count;
 	}
 
 }
