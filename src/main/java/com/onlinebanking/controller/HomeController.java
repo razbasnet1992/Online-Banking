@@ -22,8 +22,9 @@ public class HomeController {
 		case "create":
 			Account account = getAccount();
 			double balance = Double.parseDouble(JOptionPane.showInputDialog("Enter your initial balance :"));
-			int created = operationService.createAccount(account,balance);
-			if(created>=0) {
+			int securityPin = Integer.parseInt(JOptionPane.showInputDialog("Create security pin :"));
+			int created = operationService.createAccount(account,balance,securityPin);
+			if(created>=1) {
 				System.out.println("successfully created");
 			}
 			else {
@@ -33,7 +34,8 @@ public class HomeController {
 		case "deposit":
 			int id = Integer.parseInt(JOptionPane.showInputDialog("Enter id :"));
 			double amount = Double.parseDouble(JOptionPane.showInputDialog("Enter amount :"));
-			int success = operationService.depositAmount(id, amount);
+			int pin = Integer.parseInt(JOptionPane.showInputDialog("Enter your security pin :"));
+			int success = operationService.depositAmount(id, amount,pin);
 			if(success>=1) {
 				System.out.println("successfully deposited");
 			}
@@ -44,7 +46,8 @@ public class HomeController {
 		case "draw":
 			id = Integer.parseInt(JOptionPane.showInputDialog("Enter id :"));
 			amount = Double.parseDouble(JOptionPane.showInputDialog("Enter amount :"));
-			int draw = operationService.withdrawAmount(id, amount);
+			pin = Integer.parseInt(JOptionPane.showInputDialog("Enter your security pin :"));
+			int draw = operationService.withdrawAmount(id, amount,pin);
 			if(draw>=1) {
 				System.out.println("successfully withdrawn");
 			}
@@ -54,7 +57,8 @@ public class HomeController {
 			break;
 		case "check":
 			id = Integer.parseInt(JOptionPane.showInputDialog("Enter id :"));
-			boolean check = operationService.checkBalance(id);
+			pin = Integer.parseInt(JOptionPane.showInputDialog("Enter your security pin :"));
+			boolean check = operationService.checkBalance(id,pin);
 			if(check) {
 				System.out.println("successful");
 			}

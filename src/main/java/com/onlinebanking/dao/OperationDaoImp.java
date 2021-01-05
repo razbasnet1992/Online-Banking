@@ -13,8 +13,9 @@ import com.onlinebanking.model.AccountInfo;
 import com.onlinebanking.util.DbUtil;
 
 public class OperationDaoImp implements OperationDao {
+	SecurityCheck securityCheck = new SecurityCheck();
 
-	public static final String INSERT_ACCOUNT_INFO = "call insert_into_twoTables(?,?,?,?,?)";
+	public static final String INSERT_ACCOUNT_INFO = "call insert_into_twoTables(?,?,?,?,?,?)";
 	public static final String DELETE_QUERY = "DELETE account_db,transaction_tbl from account_db  INNER JOIN transaction_tbl  \n"
 			+ "WHERE account_db.id= transaction_tbl.id and account_db.id = ?";
 
@@ -29,52 +30,64 @@ public class OperationDaoImp implements OperationDao {
 	String now = formatter.format(date);
 
 	@Override
-	public int createAccount(Account account,double balance) {
+	public int createAccount(Account account, double balance, int securityPin) {
+		int created = 0;
 		try (PreparedStatement pa = DbUtil.getConnection().prepareStatement(INSERT_ACCOUNT_INFO);) {
 			pa.setString(1, account.getAccountName());
 			pa.setLong(2, account.getAccountNo());
 			pa.setString(3, account.getEmail());
 			pa.setLong(4, account.getMobileNo());
 			pa.setDouble(5, balance);
-			pa.executeUpdate();
+			pa.setDouble(6, securityPin);
+			created = pa.executeUpdate();
 
 		} catch (SQLException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		return 0;
+		return created;
 	}
 
 	@Override
-	public int depositAmount(int id, double depositAmount) {
+	public int depositAmount(int id, double depositAmount, int pin) {
 		int d = 0;
-		try (PreparedStatement pa = DbUtil.getConnection().prepareStatement(GET_BALANCE);) {
+		boolean flag = securityCheck.securityCheck(id, pin);
+		if (flag) {
 
-			pa.setInt(1, id);
-			ResultSet rs = pa.executeQuery();
-			double currentBalance = 0;
-			if (rs.next()) {
-				currentBalance = rs.getDouble("balance");
-				System.out.println("Balance before deposit operation :" + currentBalance + " for account id :" + id);
-				System.out.println("Deposited Amount :" + depositAmount);
-				if (depositAmount > 0) {
-					currentBalance += depositAmount;
-					d =pa.executeUpdate("update transaction_tbl set balance ='" + currentBalance + "',deposit_amount='"
-							+ depositAmount + "',deposit_date ='" + now + "' where id ='" + id + "'");
+			try (PreparedStatement pa = DbUtil.getConnection().prepareStatement(GET_BALANCE);) {
+
+				pa.setInt(1, id);
+				ResultSet rs = pa.executeQuery();
+				double currentBalance = 0;
+				if (rs.next()) {
+					currentBalance = rs.getDouble("balance");
 					System.out
-							.println("Account Balance after deposit :" + currentBalance + " for account id :" + id);
-				} else {
-					System.out.println("Amount should be greater than zero.");
+							.println("Balance before deposit operation :" + currentBalance + " for account id :" + id);
+					System.out.println("Deposited Amount :" + depositAmount);
+					if (depositAmount > 0) {
+						currentBalance += depositAmount;
+						d = pa.executeUpdate(
+								"update transaction_tbl set balance ='" + currentBalance + "',deposit_amount='"
+										+ depositAmount + "',deposit_date ='" + now + "' where id ='" + id + "'");
+						System.out
+								.println("Account Balance after deposit :" + currentBalance + " for account id :" + id);
+					} else
+						System.out.println("Amount should be greater than zero.");
 				}
 			}
-		} catch (SQLException | ClassNotFoundException e) {
-			e.printStackTrace();
-		}
+
+			catch (SQLException | ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		} else
+			System.out.println("Pin do not match");
 		return d;
 	}
 
 	@Override
-	public int withdrawAmount(int id, double withdrawnAmount) {
+	public int withdrawAmount(int id, double withdrawnAmount,int pin) {
 		int withDraw = 0;
+		boolean flag = securityCheck.securityCheck(id,pin);
+		if (flag) {
 		try (PreparedStatement pa = DbUtil.getConnection().prepareStatement(GET_BALANCE);) {
 			pa.setInt(1, id);
 			ResultSet rs = pa.executeQuery();
@@ -98,24 +111,30 @@ public class OperationDaoImp implements OperationDao {
 		} catch (SQLException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+		}else
+			System.out.println("Pin does not match");
 		return withDraw;
 	}
 
 	@Override
-	public boolean checkBalance(int id) {
+	public boolean checkBalance(int id,int pin) {
 		boolean flag = false;
+		boolean check = securityCheck.securityCheck(id, pin);
+		if(check) {
 		try (PreparedStatement pa = DbUtil.getConnection().prepareStatement(GET_BALANCE);) {
 			pa.setInt(1, id);
 			ResultSet rs = pa.executeQuery();
 			double currentBalance = 0;
 			if (rs.next()) {
 				currentBalance = rs.getDouble("balance");
-				System.out.println(currentBalance + " for account id :" + id);
+				System.out.println("Balance is "+currentBalance + " for account id :" + id);
 				flag = true;
 			}
 		} catch (SQLException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+		}else
+			System.out.println("Pin does not match/Enter correct pin");
 		return flag;
 	}
 
@@ -186,17 +205,18 @@ public class OperationDaoImp implements OperationDao {
 		}
 		return deleteNum;
 	}
+
 	public int sumAndCountCustomers() {
-		int count =0;
-		try(PreparedStatement pa = DbUtil.getConnection().prepareStatement(GET_SUM_AND_COUNT);){
+		int count = 0;
+		try (PreparedStatement pa = DbUtil.getConnection().prepareStatement(GET_SUM_AND_COUNT);) {
 			ResultSet rs = pa.executeQuery();
-			if(rs.next()) {
-				
-				System.out.println("Total balance in the bank :"+rs.getDouble(2));
-				System.out.println("Total customers :"+rs.getInt(1));
-				count =1;
+			if (rs.next()) {
+
+				System.out.println("Total balance in the bank :" + rs.getDouble(2));
+				System.out.println("Total customers :" + rs.getInt(1));
+				count = 1;
 			}
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return count;
