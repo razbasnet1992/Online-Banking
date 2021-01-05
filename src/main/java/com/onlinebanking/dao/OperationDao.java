@@ -12,7 +12,8 @@ public interface OperationDao {
 	boolean checkBalance(int id,int pin);
 	List<AccountInfo> listOfCustomers();
 	AccountInfo findCustomer(int id);
-	public int deleteCustomer(int id);
+	
 	public int sumAndCountCustomers();
+	int deleteCustomer(int id, int pin);
 	
 }

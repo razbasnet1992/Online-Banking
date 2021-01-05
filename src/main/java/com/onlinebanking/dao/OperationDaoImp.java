@@ -96,7 +96,7 @@ public class OperationDaoImp implements OperationDao {
 				currentBalance = rs.getDouble("balance");
 
 				System.out.println("Balance before withdrawing :" + currentBalance + " for account id :" + id);
-				System.out.println("Withdrwal Amount :" + withdrawnAmount);
+				System.out.println("Withdrawal Amount :" + withdrawnAmount);
 				if (withdrawnAmount < currentBalance && withdrawnAmount > 0) {
 					currentBalance = currentBalance - withdrawnAmount;
 					withDraw = pa.executeUpdate("update transaction_tbl set balance ='" + currentBalance
@@ -194,8 +194,10 @@ public class OperationDaoImp implements OperationDao {
 	}
 
 	@Override
-	public int deleteCustomer(int id) {
+	public int deleteCustomer(int id,int pin) {
 		int deleteNum = 0;
+		boolean flag = securityCheck.securityCheck(id, pin);
+		if (flag) {
 		try (PreparedStatement pa = DbUtil.getConnection().prepareStatement(DELETE_QUERY);) {
 			pa.setInt(1, id);
 			deleteNum = pa.executeUpdate();
@@ -203,6 +205,8 @@ public class OperationDaoImp implements OperationDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		}else
+			System.out.println("Wrong pin");
 		return deleteNum;
 	}
 
@@ -219,6 +223,7 @@ public class OperationDaoImp implements OperationDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	
 		return count;
 	}
 

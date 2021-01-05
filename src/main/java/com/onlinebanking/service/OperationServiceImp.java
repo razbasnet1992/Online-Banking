@@ -46,8 +46,8 @@ public class OperationServiceImp implements OperationService{
 	}
 
 	@Override
-	public int deleteCustomer(int id) {
-		return operationDao.deleteCustomer(id);
+	public int deleteCustomer(int id,int pin) {
+		return operationDao.deleteCustomer(id,pin);
 	}
 
 	@Override

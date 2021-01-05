@@ -92,7 +92,8 @@ public class HomeController {
 			break;
 		case "delete":
 			id = Integer.parseInt(JOptionPane.showInputDialog("Enter id :"));
-			int deleted = operationService.deleteCustomer(id);
+			pin = Integer.parseInt(JOptionPane.showInputDialog("Enter your security pin :"));
+			int deleted = operationService.deleteCustomer(id,pin);
 			if(deleted>=1) {
 				System.out.println("Deletion successful");
 			}

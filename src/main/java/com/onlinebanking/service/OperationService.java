@@ -14,7 +14,7 @@ public interface OperationService {
 	
 	List<AccountInfo> listOfCustomers();
 	AccountInfo findCustomer(int id);
-	public int deleteCustomer(int id);
+	public int deleteCustomer(int id,int pin);
 	public int sumAndCountCustomers();
 	//public boolean securityCheck();
 }
